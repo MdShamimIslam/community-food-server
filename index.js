@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require("cors");
 require("dotenv").config();
 const port = process.env.PORT || 5000;
@@ -27,8 +27,20 @@ async function run() {
     const foodCollection = client.db('foodBuzz').collection('foods');
 
     // food related api
-    app.get('/foods', async(req,res)=>{
+    app.get('/limitFoods', async(req,res)=>{
         const result = await foodCollection.find().limit(6).sort({ "quantity": -1 }).toArray();
+        res.send(result);
+    })
+
+    app.get('/Foods', async(req,res)=>{
+        const result = await foodCollection.find().toArray();
+        res.send(result);
+    })
+
+    app.get('/Foods/:id', async(req,res)=>{
+        const id = req.params.id;
+        const query = { _id : new ObjectId(id)};
+        const result = await foodCollection.findOne(query);
         res.send(result);
     })
 
