@@ -32,16 +32,22 @@ async function run() {
         res.send(result);
     })
 
-    app.get('/Foods', async(req,res)=>{
+    app.get('/foods', async(req,res)=>{
         const result = await foodCollection.find().toArray();
         res.send(result);
     })
 
-    app.get('/Foods/:id', async(req,res)=>{
+    app.get('/foods/:id', async(req,res)=>{
         const id = req.params.id;
         const query = { _id : new ObjectId(id)};
         const result = await foodCollection.findOne(query);
         res.send(result);
+    })
+
+    app.post('/createFood', async(req,res)=>{
+      const food = req.body;
+      const result = await foodCollection.insertOne(food);
+      res.send(result);
     })
 
 
