@@ -25,8 +25,9 @@ async function run() {
     await client.connect();
     // collection
     const foodCollection = client.db('foodBuzz').collection('foods');
+    const requestFoodCollection = client.db('foodBuzz').collection('requestFoods');
 
-    // food related api
+   // FOOD RELATED API
     app.get('/limitFoods', async(req,res)=>{
         const result = await foodCollection.find().limit(6).sort({ "quantity": -1 }).toArray();
         res.send(result);
@@ -54,6 +55,18 @@ async function run() {
       const email = req.query.email;
       const query = { donator_email : email };
       const result = await foodCollection.find(query).toArray();
+      res.send(result);
+    })
+
+    // REQUEST FOOD RELATED API
+    app.get('/requestFood', async(req,res)=>{
+      const result = await requestFoodCollection.find().toArray();
+      res.send(result);
+    })
+
+    app.post('/requestFood', async(req,res)=>{
+      const food = req.body;
+      const result = await requestFoodCollection.insertOne(food);
       res.send(result);
     })
 
