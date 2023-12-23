@@ -60,13 +60,22 @@ async function run() {
 
     // REQUEST FOOD RELATED API
     app.get('/requestFood', async(req,res)=>{
-      const result = await requestFoodCollection.find().toArray();
+      const email = req.query.email;
+      const query = { requester_email : email}
+      const result = await requestFoodCollection.find(query).toArray();
       res.send(result);
     })
 
     app.post('/requestFood', async(req,res)=>{
       const food = req.body;
       const result = await requestFoodCollection.insertOne(food);
+      res.send(result);
+    })
+
+    app.delete('/requestFood/:id', async(req,res)=>{
+      const id = req.params.id;
+      const query = { _id : new ObjectId(id) };
+      const result = await requestFoodCollection.deleteOne(query);
       res.send(result);
     })
 
