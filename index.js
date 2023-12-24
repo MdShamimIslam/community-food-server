@@ -22,7 +22,9 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // await client.connect();
+
     // collection
+
     const foodCollection = client.db("foodBuzz").collection("foods");
     const requestFoodCollection = client
       .db("foodBuzz")
@@ -40,14 +42,18 @@ async function run() {
 
     app.get("/foods", async (req, res) => {
       let query = {};
+      let sortObj = {};
       const foodName = req.query.food_name;
+      // const sortField = req.query.sortField;
+      const sortOrder = req.query.sortOrder;
+      // console.log(sortField);
       if (foodName) {
         query = { food_name: foodName };
       }
-      const result = await foodCollection
-        .find(query)
-        .sort({ expired_date: -1 })
-        .toArray();
+      if (sortOrder) {
+        sortObj = { expired_date: sortOrder };
+      }
+      const result = await foodCollection.find(query).sort(sortObj).toArray();
       res.send(result);
     });
 
@@ -71,6 +77,13 @@ async function run() {
       res.send(result);
     });
 
+    app.delete('/createFood/:id', async(req,res)=>{
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await foodCollection.deleteOne(query);
+      res.send(result);
+    })
+
     // REQUEST FOOD RELATED API
     app.get("/requestFood", async (req, res) => {
       const email = req.query.email;
@@ -92,7 +105,7 @@ async function run() {
       res.send(result);
     });
 
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
