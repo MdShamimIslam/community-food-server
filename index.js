@@ -64,12 +64,7 @@ async function run() {
       res.send(result);
     });
 
-    app.post("/createFood", async (req, res) => {
-      const food = req.body;
-      const result = await foodCollection.insertOne(food);
-      res.send(result);
-    });
-
+    // createdFood api
     app.get("/createFood", async (req, res) => {
       const email = req.query.email;
       const query = { donator_email: email };
@@ -77,12 +72,44 @@ async function run() {
       res.send(result);
     });
 
-    app.delete('/createFood/:id', async(req,res)=>{
+    app.get("/createFood/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await foodCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.post("/createFood", async (req, res) => {
+      const food = req.body;
+      const result = await foodCollection.insertOne(food);
+      res.send(result);
+    });
+
+    app.delete("/createFood/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await foodCollection.deleteOne(query);
       res.send(result);
-    })
+    });
+
+    app.put("/createFood/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updateFood = req.body;
+      const options = { upsert: true };
+      const food = {
+        $set: {
+          food_name: updateFood.food_name,
+          food_img: updateFood.food_img,
+          quantity: updateFood.quantity,
+          expired_date: updateFood.expired_date,
+          location: updateFood.location,
+          food_Des: updateFood.food_Des,
+        },
+      };
+      const result = await foodCollection.updateOne(filter, food, options);
+      res.send(result);
+    });
 
     // REQUEST FOOD RELATED API
     app.get("/requestFood", async (req, res) => {
